@@ -6,6 +6,7 @@ import {
   launchCommand,
   open,
   openCommandPreferences,
+  showHUD,
 } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import {
@@ -104,7 +105,15 @@ export default function MenuBar() {
           title="Refresh Now"
           shortcut={{ modifiers: ["cmd"], key: "r" }}
           onAction={async () => {
-            await fetchUsage({ force: true });
+            try {
+              await fetchUsage({ force: true });
+            } catch (e) {
+              await showHUD(
+                e instanceof ClaudeApiError
+                  ? `⚠ ${e.message}`
+                  : "⚠ Refresh failed",
+              );
+            }
             revalidate();
           }}
         />

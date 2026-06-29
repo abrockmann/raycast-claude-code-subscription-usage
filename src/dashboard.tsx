@@ -4,7 +4,9 @@ import {
   Color,
   Icon,
   List,
+  Toast,
   openExtensionPreferences,
+  showToast,
 } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { ClaudeApiError, fetchUsage } from "./lib/client";
@@ -315,7 +317,15 @@ function CommonActions({ revalidate }: { revalidate: () => void }) {
         icon={Icon.ArrowClockwise}
         shortcut={{ modifiers: ["cmd"], key: "r" }}
         onAction={async () => {
-          await fetchUsage({ force: true });
+          try {
+            await fetchUsage({ force: true });
+          } catch (e) {
+            await showToast({
+              style: Toast.Style.Failure,
+              title: "Refresh failed",
+              message: e instanceof ClaudeApiError ? e.message : String(e),
+            });
+          }
           revalidate();
         }}
       />
